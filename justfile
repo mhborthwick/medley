@@ -1,2 +1,4 @@
+set dotenv-path := 'authserver/.env'
+
 start_auth_server:
-  @go run auth_server/cmd/main.go
+  @go run authserver/cmd/main.go
