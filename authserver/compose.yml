@@ -9,3 +9,14 @@ services:
       - .env
     ports:
       - "1337:1337"
+  cache:
+    image: "redis:latest"
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - cache:/data
+
+volumes:
+  cache:
+    driver: local
