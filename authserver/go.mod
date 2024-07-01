@@ -1,4 +1,4 @@
-module github.com/mhborthwick/authserver
+module github.com/mhborthwick/medley/authserver
 
 go 1.22.4
 
