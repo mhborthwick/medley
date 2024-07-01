@@ -4,7 +4,7 @@ start_auth_server:
   @go run authserver/cmd/main.go
 
 start_auth_server_docker:
-  @docker compose -f authserver/compose.yml up -d
+  @docker compose -f authserver/compose.yml up --build -d
 
 stop_auth_server_docker:
   @docker compose -f authserver/compose.yml stop
