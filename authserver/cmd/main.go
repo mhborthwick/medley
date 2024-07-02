@@ -95,7 +95,7 @@ func APIToken(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	tokenResponse := map[string]string{
-		"access_token": token.AccessToken,
+		"access_token": newToken.AccessToken,
 	}
 	json.NewEncoder(w).Encode(tokenResponse)
 }
