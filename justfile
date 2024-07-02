@@ -8,3 +8,6 @@ stop_auth_server_docker:
 
 run_cli:
   @go run cli/cmd/main.go
+
+run_test:
+  @go test github.com/mhborthwick/medley/... -cover
