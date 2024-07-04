@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -25,6 +27,33 @@ func handleError(err error) {
 	}
 }
 
+type TokenResponse struct {
+	AccessToken string `json:"access_token"`
+}
+
+func GetToken() (string, error) {
+	client := &http.Client{}
+	url := "http://localhost:1337/api/token"
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", err
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer res.Body.Close()
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
+	var parsed TokenResponse
+	if err := json.Unmarshal(body, &parsed); err != nil {
+		return "", err
+	}
+	return parsed.AccessToken, nil
+}
+
 func main() {
 	ctx := kong.Parse(&CLI)
 	evaluator, err := pkl.NewEvaluator(context.Background(), pkl.PreconfiguredOptions)
@@ -42,9 +71,13 @@ func main() {
 			panic(err)
 		}
 
+		// get token from authserver
+		token, err := GetToken()
+		handleError(err)
+
 		spotifyClient := spotify.Spotify{
 			URL:    "https://api.spotify.com",
-			Token:  cfg.Token,
+			Token:  token,
 			UserID: cfg.UserID,
 			Client: &http.Client{},
 		}
