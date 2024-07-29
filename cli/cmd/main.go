@@ -147,6 +147,40 @@ func main() {
 		if err = evaluator.EvaluateModule(context.Background(), pkl.FileSource(CLI.Sync.Path), &cfg); err != nil {
 			panic(err)
 		}
+
+		// get token from authserver
+		token, err := GetToken()
+		handleError(err)
+
+		spotifyClient := spotify.Spotify{
+			URL:    "https://api.spotify.com",
+			Token:  token,
+			UserID: cfg.UserID,
+			Client: &http.Client{},
+		}
+
+		var all []string
+
+		for _, p := range cfg.Playlists {
+			id, err := spotify.GetID(p)
+			handleError(err)
+			baseURL := fmt.Sprintf("%s/v1/playlists/%s/tracks", spotifyClient.URL, id)
+			nextURL := baseURL
+			// you have to paginate these requests
+			// because spotify caps you at 20 songs per request
+			for nextURL != "" {
+				body, err := spotifyClient.GetPlaylistItems(nextURL)
+				handleError(err)
+				uris, err := spotify.GetURIs(body)
+				handleError(err)
+				all = append(all, uris...)
+				nextURL, err = spotify.GetNextURL(body)
+				handleError(err)
+			}
+		}
+
+		fmt.Println(all)
+
 	default:
 		panic(ctx.Command())
 	}
