@@ -69,7 +69,7 @@ func main() {
 		startNow := time.Now()
 		fmt.Println("Evaluating from: " + CLI.Create.Path)
 
-		var cfg spotify.Config
+		var cfg spotify.CreateConfig
 		if err = evaluator.EvaluateModule(context.Background(), pkl.FileSource(CLI.Create.Path), &cfg); err != nil {
 			panic(err)
 		}
@@ -140,7 +140,13 @@ func main() {
 		fmt.Println("Playlist:", "https://open.spotify.com/playlist/"+playlistID)
 		fmt.Println("Created in:", time.Since(startNow))
 	case "sync <path>":
-		fmt.Println("hey!")
+		// startNow := time.Now()
+		fmt.Println("Evaluating from: " + CLI.Sync.Path)
+
+		var cfg spotify.SyncConfig
+		if err = evaluator.EvaluateModule(context.Background(), pkl.FileSource(CLI.Sync.Path), &cfg); err != nil {
+			panic(err)
+		}
 	default:
 		panic(ctx.Command())
 	}

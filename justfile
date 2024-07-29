@@ -10,7 +10,7 @@ run_cli_create:
   @go run cli/cmd/main.go create cli/config/example.pkl
 
 run_cli_sync:
-  @go run cli/cmd/main.go sync cli/config/example.pkl
+  @go run cli/cmd/main.go sync cli/config/example2.pkl
 
 run_test:
   @go test github.com/mhborthwick/medley/... -cover
