@@ -159,6 +159,26 @@ func main() {
 			Client: &http.Client{},
 		}
 
+		// get all uris from target playlist
+		var target []string
+
+		id, err := spotify.GetID(cfg.Destination)
+		handleError(err)
+		baseURL := fmt.Sprintf("%s/v1/playlists/%s/tracks", spotifyClient.URL, id)
+		nextURL := baseURL
+		for nextURL != "" {
+			body, err := spotifyClient.GetPlaylistItems(nextURL)
+			handleError(err)
+			uris, err := spotify.GetURIs(body)
+			handleError(err)
+			target = append(target, uris...)
+			nextURL, err = spotify.GetNextURL(body)
+			handleError(err)
+		}
+
+		fmt.Println("target", target)
+
+		// get all uris from provided playlists
 		var all []string
 
 		for _, p := range cfg.Playlists {
@@ -179,7 +199,7 @@ func main() {
 			}
 		}
 
-		fmt.Println(all)
+		fmt.Println("all", all)
 
 	default:
 		panic(ctx.Command())
