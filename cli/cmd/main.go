@@ -176,7 +176,15 @@ func main() {
 			handleError(err)
 		}
 
-		fmt.Println("target", target)
+		// fmt.Println("target", target)
+
+		// create target map
+		targetMap := make(map[string]bool)
+		for _, t := range target {
+			targetMap[t] = false
+		}
+
+		fmt.Println(targetMap)
 
 		// get all uris from provided playlists
 		var all []string
@@ -199,7 +207,7 @@ func main() {
 			}
 		}
 
-		fmt.Println("all", all)
+		// fmt.Println("all", all)
 
 	default:
 		panic(ctx.Command())
