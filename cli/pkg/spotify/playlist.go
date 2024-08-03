@@ -36,6 +36,10 @@ type AddItemsToPlaylistRequestBody struct {
 	URIs []string `json:"uris"`
 }
 
+type DeleteItemsFromPlaylistRequestBody struct {
+	Tracks []Track `json:"tracks"`
+}
+
 // GetPlaylistItems gets the items (tracks) within a Spotify playlist.
 func (s Spotify) GetPlaylistItems(url string) ([]byte, error) {
 	req, err := http.NewRequest("GET", url, nil)
@@ -104,6 +108,40 @@ func (s Spotify) AddItemsToPlaylist(uris []string, playlistID string) ([]byte, e
 		return nil, err
 	}
 	req, err := http.NewRequest("POST", s.URL+"/v1/playlists/"+playlistID+"/tracks", bytes.NewBuffer(requestBody))
+	if err != nil {
+		return nil, err
+	}
+	token := "Bearer " + s.Token
+	req.Header.Set("Authorization", token)
+	req.Header.Set("Content-Type", "application/json")
+	res, err := s.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
+}
+
+// DeleteItemsFromPlaylist deletes items (tracks) from a playlist.
+func (s Spotify) DeleteItemsFromPlaylist(uris []string, playlistID string) ([]byte, error) {
+	tracks := make([]Track, len(uris))
+	for i, uri := range uris {
+		tracks[i] = Track{URI: uri}
+	}
+	requestData := DeleteItemsFromPlaylistRequestBody{
+		Tracks: tracks,
+	}
+
+	requestBody, err := json.Marshal(requestData)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", s.URL+"/v1/playlists/"+playlistID+"/tracks", bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, err
 	}

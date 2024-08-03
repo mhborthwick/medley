@@ -276,6 +276,12 @@ func main() {
 		}
 
 		fmt.Println(toRemovePayloads)
+
+		// handle deletion
+		for _, p := range toRemovePayloads {
+			_, err = spotifyClient.DeleteItemsFromPlaylist(p, cfg.Destination)
+			handleError(err)
+		}
 	default:
 		panic(ctx.Command())
 	}
