@@ -223,8 +223,17 @@ func main() {
 
 		fmt.Println("toAdd", toAdd, len(toAdd))
 
-		// fmt.Println(targetMap)
+		// get values still set to false
+		// these should be deleted
+		toRemove := []string{}
 
+		for k, v := range targetMap {
+			if !v {
+				toRemove = append(toRemove, k)
+			}
+		}
+
+		fmt.Println("toRemove", toRemove, len(toRemove))
 	default:
 		panic(ctx.Command())
 	}
