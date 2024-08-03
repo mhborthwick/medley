@@ -221,7 +221,7 @@ func main() {
 			}
 		}
 
-		fmt.Println("toAdd", toAdd, len(toAdd))
+		// fmt.Println("toAdd", toAdd, len(toAdd))
 
 		// get values still set to false
 		// these should be deleted
@@ -233,7 +233,31 @@ func main() {
 			}
 		}
 
-		fmt.Println("toRemove", toRemove, len(toRemove))
+		// fmt.Println("toRemove", toRemove, len(toRemove))
+
+		//
+		// TODO: handle duplicates
+		//
+
+		var toAddPayloads [][]string
+
+		// creates multiple payloads with <=100 songs to send in batches
+		// because spotify caps you at 100 songs per request
+		for len(toAdd) > 0 {
+			var payload []string
+			if len(toAdd) >= 100 {
+				payload, toAdd = toAdd[:100], toAdd[100:]
+			} else {
+				payload, toAdd = toAdd, nil
+			}
+			toAddPayloads = append(toAddPayloads, payload)
+		}
+
+		fmt.Println(toAddPayloads)
+
+		//
+		// TODO: handle add items to playlist
+		//
 	default:
 		panic(ctx.Command())
 	}
