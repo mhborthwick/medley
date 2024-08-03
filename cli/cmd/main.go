@@ -184,7 +184,7 @@ func main() {
 			targetMap[t] = false
 		}
 
-		fmt.Println(targetMap)
+		// fmt.Println(targetMap)
 
 		// get all uris from provided playlists
 		var all []string
@@ -207,7 +207,23 @@ func main() {
 			}
 		}
 
-		// fmt.Println("all", all)
+		// if uri in target playlist
+		// set value to true
+		// if not, add to toAdd slice
+		toAdd := []string{}
+
+		for _, a := range all {
+			_, ok := targetMap[a]
+			if ok {
+				targetMap[a] = true
+			} else {
+				toAdd = append(toAdd, a)
+			}
+		}
+
+		fmt.Println("toAdd", toAdd, len(toAdd))
+
+		// fmt.Println(targetMap)
 
 	default:
 		panic(ctx.Command())
