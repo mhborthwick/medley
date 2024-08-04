@@ -140,7 +140,7 @@ func main() {
 		fmt.Println("Playlist:", "https://open.spotify.com/playlist/"+playlistID)
 		fmt.Println("Created in:", time.Since(startNow))
 	case "sync <path>":
-		// startNow := time.Now()
+		startNow := time.Now()
 		fmt.Println("Evaluating from: " + CLI.Sync.Path)
 
 		var cfg spotify.SyncConfig
@@ -223,6 +223,37 @@ func main() {
 
 		// fmt.Println("toAdd", toAdd, len(toAdd))
 
+		// cleans duplicate "toAdd songs"
+		// we won't need to clean "toRemove songs"
+		// because the way we evaluate them
+		uniqueToAddMap := make(map[string]bool)
+		uniqueToAdd := make([]string, 0, len(uniqueToAddMap))
+		for _, uri := range toAdd {
+			if _, found := uniqueToAddMap[uri]; !found {
+				uniqueToAddMap[uri] = true
+				uniqueToAdd = append(uniqueToAdd, uri)
+			}
+		}
+
+		// fmt.Println("toAddUnique", uniqueToAdd, len(uniqueToAdd))
+
+		// create toAdd payloads
+		var toAddPayloads [][]string
+
+		// creates multiple payloads with <=100 songs to send in batches
+		// because spotify caps you at 100 songs per request
+		for len(uniqueToAdd) > 0 {
+			var payload []string
+			if len(uniqueToAdd) >= 100 {
+				payload, uniqueToAdd = uniqueToAdd[:100], uniqueToAdd[100:]
+			} else {
+				payload, uniqueToAdd = uniqueToAdd, nil
+			}
+			toAddPayloads = append(toAddPayloads, payload)
+		}
+
+		fmt.Println("adding", toAddPayloads)
+
 		// get values still set to false
 		// these should be deleted
 		toRemove := []string{}
@@ -234,31 +265,6 @@ func main() {
 		}
 
 		// fmt.Println("toRemove", toRemove, len(toRemove))
-
-		//
-		// TODO: handle duplicates
-		//
-
-		// create toAdd payloads
-		var toAddPayloads [][]string
-
-		// creates multiple payloads with <=100 songs to send in batches
-		// because spotify caps you at 100 songs per request
-		for len(toAdd) > 0 {
-			var payload []string
-			if len(toAdd) >= 100 {
-				payload, toAdd = toAdd[:100], toAdd[100:]
-			} else {
-				payload, toAdd = toAdd, nil
-			}
-			toAddPayloads = append(toAddPayloads, payload)
-		}
-
-		// fmt.Println(toAddPayloads)
-
-		//
-		// TODO: handle add items to playlist
-		//
 
 		// create toRemove payloads
 		var toRemovePayloads [][]string
@@ -275,13 +281,21 @@ func main() {
 			toRemovePayloads = append(toRemovePayloads, payload)
 		}
 
-		fmt.Println(toRemovePayloads)
+		fmt.Println("removing", toRemovePayloads)
 
 		// handle deletion
 		for _, p := range toRemovePayloads {
 			_, err = spotifyClient.DeleteItemsFromPlaylist(p, cfg.Destination)
 			handleError(err)
 		}
+
+		// handle addition
+		for _, p := range toAddPayloads {
+			_, err = spotifyClient.AddItemsToPlaylist(p, cfg.Destination)
+			handleError(err)
+		}
+		fmt.Println("Playlist:", "https://open.spotify.com/playlist/"+cfg.Destination)
+		fmt.Println("Created in:", time.Since(startNow))
 	default:
 		panic(ctx.Command())
 	}
