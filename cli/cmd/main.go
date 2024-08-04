@@ -176,15 +176,11 @@ func main() {
 			handleError(err)
 		}
 
-		// fmt.Println("target", target)
-
 		// create target map
 		targetMap := make(map[string]bool)
 		for _, t := range target {
 			targetMap[t] = false
 		}
-
-		// fmt.Println(targetMap)
 
 		// get all uris from provided playlists
 		var all []string
@@ -221,8 +217,6 @@ func main() {
 			}
 		}
 
-		// fmt.Println("toAdd", toAdd, len(toAdd))
-
 		// cleans duplicate "toAdd songs"
 		// we won't need to clean "toRemove songs"
 		// because the way we evaluate them
@@ -235,13 +229,10 @@ func main() {
 			}
 		}
 
-		// fmt.Println("toAddUnique", uniqueToAdd, len(uniqueToAdd))
-
-		// create toAdd payloads
-		var toAddPayloads [][]string
-
 		// creates multiple payloads with <=100 songs to send in batches
 		// because spotify caps you at 100 songs per request
+		var toAddPayloads [][]string
+
 		for len(uniqueToAdd) > 0 {
 			var payload []string
 			if len(uniqueToAdd) >= 100 {
@@ -264,13 +255,9 @@ func main() {
 			}
 		}
 
-		// fmt.Println("toRemove", toRemove, len(toRemove))
-
-		// create toRemove payloads
-		var toRemovePayloads [][]string
-
 		// creates multiple payloads with <=100 songs to send in batches
 		// because spotify caps you at 100 songs per request
+		var toRemovePayloads [][]string
 		for len(toRemove) > 0 {
 			var payload []string
 			if len(toRemove) >= 100 {
