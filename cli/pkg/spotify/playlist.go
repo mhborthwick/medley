@@ -33,7 +33,8 @@ type CreatePlaylistResponseBody struct {
 }
 
 type AddItemsToPlaylistRequestBody struct {
-	URIs []string `json:"uris"`
+	URIs     []string `json:"uris"`
+	Position *int     `json:"position"`
 }
 
 type DeleteItemsFromPlaylistRequestBody struct {
@@ -99,9 +100,18 @@ func (s Spotify) CreatePlaylist() (string, error) {
 }
 
 // AddItemsToPlaylist adds items (tracks) to a playlist.
-func (s Spotify) AddItemsToPlaylist(uris []string, playlistID string) ([]byte, error) {
-	requestData := AddItemsToPlaylistRequestBody{
-		URIs: uris,
+func (s Spotify) AddItemsToPlaylist(uris []string, playlistID string, prepend bool) ([]byte, error) {
+	var requestData AddItemsToPlaylistRequestBody
+	if prepend {
+		position := 0
+		requestData = AddItemsToPlaylistRequestBody{
+			URIs:     uris,
+			Position: &position,
+		}
+	} else {
+		requestData = AddItemsToPlaylistRequestBody{
+			URIs: uris,
+		}
 	}
 	requestBody, err := json.Marshal(requestData)
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"slices"
 	"time"
 
 	"github.com/alecthomas/kong"
@@ -133,7 +134,7 @@ func main() {
 		}
 
 		for _, p := range payloads {
-			_, err = spotifyClient.AddItemsToPlaylist(p, playlistID)
+			_, err = spotifyClient.AddItemsToPlaylist(p, playlistID, false)
 			handleError(err)
 		}
 
@@ -276,9 +277,12 @@ func main() {
 			handleError(err)
 		}
 
+		// reverse items in toAddPayloads
+		slices.Reverse(toAddPayloads)
+
 		// handle addition
 		for _, p := range toAddPayloads {
-			_, err = spotifyClient.AddItemsToPlaylist(p, cfg.Destination)
+			_, err = spotifyClient.AddItemsToPlaylist(p, cfg.Destination, true)
 			handleError(err)
 		}
 		fmt.Println("Playlist:", "https://open.spotify.com/playlist/"+cfg.Destination)

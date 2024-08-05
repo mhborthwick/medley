@@ -67,7 +67,7 @@ func TestAddItemsToPlaylist(t *testing.T) {
 			UserID: "me",
 			Client: &http.Client{},
 		}
-		data, err := spotifyClient.AddItemsToPlaylist([]string{"abc", "def"}, "123")
+		data, err := spotifyClient.AddItemsToPlaylist([]string{"abc", "def"}, "123", false)
 		assert.Equal(t, mockResponse, data)
 		assert.Nil(t, err)
 	})
